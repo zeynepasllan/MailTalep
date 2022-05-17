@@ -1,0 +1,161 @@
+<!DOCTY "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="application/xht />
+<title>ZZAS_P001_FRM</title>
+</head>
+<body>
+<table class="outerTable">
+  <tr class="normalBoldLarge">
+     <td><h2>Code listing for: ZZAS_P001_FRM</h2>
+<h3> Description: </h3></td>
+   </tr>
+  <tr>
+     <td>
+     <table class="innerTable">
+       <tr>
+          <td>
+   <div class="code">
+DEFINE top_of_page  .<br />
+&nbsp;&nbsp;gt_top-typ&nbsp;&nbsp;=&nbsp;&1&nbsp;.<br />
+&nbsp;&nbsp;gt_top-key&nbsp;&nbsp;=&nbsp;&2&nbsp;.<br />
+&nbsp;&nbsp;gt_top-info&nbsp;=&nbsp;&3&nbsp;.<br />
+&nbsp;&nbsp;APPEND&nbsp;gt_top&nbsp;.&nbsp;CLEAR&nbsp;gt_top&nbsp;.<br />
+end-of-definition   .<br />
+FORM get_data .<br />
+&nbsp;&nbsp;SELECT&nbsp;b~partner&nbsp;d~addrnumber&nbsp;d~remark&nbsp;c~SMTP_ADDR<br />
+&nbsp;&nbsp;FROM&nbsp;but000&nbsp;AS&nbsp;b<br />
+&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;adrt&nbsp;AS&nbsp;d&nbsp;ON&nbsp;b~addrcomm&nbsp;EQ&nbsp;d~addrnumber<br />
+&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;adr6&nbsp;AS&nbsp;c&nbsp;ON&nbsp;c~addrnumber&nbsp;EQ&nbsp;d~addrnumber<br />
+&nbsp;&nbsp;INTO&nbsp;CORRESPONDING&nbsp;FIELDS&nbsp;OF&nbsp;TABLE&nbsp;gt_ot2.<br />
+ENDFORM.<br />
+FORM set_data .<br />
+ENDFORM.<br />
+FORM show_alv .<br />
+&nbsp;&nbsp;PERFORM:<br />
+&nbsp;&nbsp;set_fc_sub&nbsp;USING&nbsp;'PARTNER'&nbsp;'Business&nbsp;Partner'&nbsp;abap_true&nbsp;'&nbsp;',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'ADDRNUMBER'&nbsp;'Adres&nbsp;No'&nbsp;abap_true&nbsp;'X',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'REMARK'&nbsp;'Not'&nbsp;abap_true&nbsp;'&nbsp;',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'SMTP_ADDR'&nbsp;'Mail'&nbsp;abap_true&nbsp;'&nbsp;'.<br />
+&nbsp;&nbsp;PERFORM&nbsp;:&nbsp;create_layout&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;top_title&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create_alv&nbsp;&nbsp;&nbsp;&nbsp;.<br />
+ENDFORM.<br />
+FORM create_layout .<br />
+&nbsp;&nbsp;gs_layout-colwidth_optimize&nbsp;=&nbsp;'X'.<br />
+&nbsp;&nbsp;gs_layout-zebra&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'X'.<br />
+&nbsp;&nbsp;gs_layout-box_fieldname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'MARK'.<br />
+ENDFORM.<br />
+FORM create_alv .<br />
+&nbsp;&nbsp;CALL&nbsp;FUNCTION&nbsp;'REUSE_ALV_GRID_DISPLAY'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_callback_program&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;sy-repid<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_callback_pf_status_set&nbsp;=&nbsp;'GUI'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_callback_user_command&nbsp;&nbsp;=&nbsp;'USER_COMMAND'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_layout&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gs_layout<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it_fieldcat&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gt_fcat[]<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_callback_top_of_page&nbsp;&nbsp;&nbsp;=&nbsp;'TOP_OF_PAGE'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;TABLES<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_outtab&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gt_ot2[]<br />
+&nbsp;&nbsp;&nbsp;&nbsp;EXCEPTIONS<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;program_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;1<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;2.<br />
+ENDFORM.<br />
+FORM create_fcat .<br />
+&nbsp;&nbsp;CALL&nbsp;FUNCTION&nbsp;'REUSE_ALV_FIELDCATALOG_MERGE'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_program_name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;sy-repid<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_internal_tabname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'GT_OT'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_inclname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;sy-repid<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_client_never_display&nbsp;=&nbsp;'X'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_bypassing_buffer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'X'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ct_fieldcat&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gt_fcat[]<br />
+&nbsp;&nbsp;&nbsp;&nbsp;EXCEPTIONS<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;3.<br />
+ENDFORM.<br />
+FORM set_fc_sub USING p_fieldname<br />
+&nbsp;&nbsp;p_seltext_m<br />
+&nbsp;&nbsp;p_key<br />
+&nbsp;&nbsp;p_hotspot.<br />
+&nbsp;&nbsp;CLEAR:&nbsp;gs_fieldcatalog.<br />
+&nbsp;&nbsp;gs_fieldcatalog-fieldname&nbsp;=&nbsp;p_fieldname.<br />
+&nbsp;&nbsp;gs_fieldcatalog-seltext_m&nbsp;=&nbsp;p_seltext_m.<br />
+&nbsp;&nbsp;gs_fieldcatalog-key&nbsp;=&nbsp;&nbsp;p_key.<br />
+&nbsp;&nbsp;gs_fieldcatalog-hotspot&nbsp;=&nbsp;&nbsp;p_hotspot.<br />
+&nbsp;&nbsp;APPEND&nbsp;gs_fieldcatalog&nbsp;TO&nbsp;gt_fcat.<br />
+ENDFORM.<br />
+FORM modify_fieldcatalog_text USING fieldname text l_text.<br />
+ENDFORM.<br />
+FORM modify_fcat  USING fieldname target value p_hotspot.<br />
+&nbsp;&nbsp;DATA:&nbsp;lv_fieldname(30).<br />
+&nbsp;&nbsp;FIELD-SYMBOLS:&nbsp;&lt;field&gt;&nbsp;TYPE&nbsp;any.<br />
+&nbsp;&nbsp;READ&nbsp;TABLE&nbsp;gt_fcat&nbsp;WITH&nbsp;KEY&nbsp;fieldname&nbsp;=&nbsp;fieldname&nbsp;INTO&nbsp;gs_fcat.<br />
+&nbsp;&nbsp;CHECK&nbsp;sy-subrc&nbsp;=&nbsp;0.<br />
+&nbsp;&nbsp;CONCATENATE&nbsp;'GS_FCAT-'&nbsp;target&nbsp;INTO&nbsp;lv_fieldname.<br />
+&nbsp;&nbsp;ASSIGN&nbsp;(lv_fieldname)&nbsp;TO&nbsp;&lt;field&gt;.<br />
+&nbsp;&nbsp;&lt;field&gt;&nbsp;=&nbsp;value.<br />
+&nbsp;&nbsp;MODIFY&nbsp;gt_fcat&nbsp;FROM&nbsp;gs_fcat&nbsp;INDEX&nbsp;sy-tabix&nbsp;.<br />
+ENDFORM.<br />
+FORM gui USING g_xpa TYPE slis_t_extab.<br />
+&nbsp;&nbsp;SET&nbsp;PF-STATUS&nbsp;'ZSTANDARD'.<br />
+ENDFORM.<br />
+FORM user_command USING p_ucomm TYPE sy-ucomm<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ps_selfield&nbsp;TYPE&nbsp;slis_selfield.<br />
+&nbsp;&nbsp;DATA:&nbsp;lv_mes&nbsp;TYPE&nbsp;char200,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lv_ind&nbsp;TYPE&nbsp;numc2.<br />
+&nbsp;&nbsp;CASE&nbsp;p_ucomm.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;'&IC1'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;'&MSG2'.<br />
+call SCREEN 0100<br />
+STARTING AT 5 5<br />
+ENDING AT 50 20.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;'&MSG'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;READ&nbsp;TABLE&nbsp;gt_OT2&nbsp;INTO&nbsp;gs_OT2&nbsp;INDEX&nbsp;ps_selfield-tabindex.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SELECT<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_addr<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FROM&nbsp;adr6&nbsp;INTO&nbsp;CORRESPONDING&nbsp;FIELDS&nbsp;OF&nbsp;TABLE&nbsp;gt_t004<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHERE&nbsp;addrnumber&nbsp;EQ&nbsp;gs_OT2-addrnumber.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;loop&nbsp;at&nbsp;gt_t004&nbsp;into&nbsp;gs_t004.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;select&nbsp;single&nbsp;REMARK&nbsp;from&nbsp;ADRT&nbsp;into&nbsp;gs_t004-remark<br />
+WHERE addrnumber EQ gs_OT2-addrnumber.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;modify&nbsp;gt_t004&nbsp;from&nbsp;gs_t004.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endloop.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cl_salv_table=&gt;factory(<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IMPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r_salv_table&nbsp;&nbsp;&nbsp;=&nbsp;go_salv<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_table&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gt_t004<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;go_salv-&gt;set_screen_popup(<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;start_column&nbsp;=&nbsp;10<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end_column&nbsp;&nbsp;&nbsp;=&nbsp;75<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;start_line&nbsp;&nbsp;&nbsp;=&nbsp;5<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end_line&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;25<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;go_salv-&gt;display(&nbsp;).<br />
+&nbsp;&nbsp;ENDCASE.<br />
+ENDFORM.<br />
+FORM top_title.<br />
+&nbsp;&nbsp;DATA&nbsp;lv_datum(10)&nbsp;.<br />
+&nbsp;&nbsp;DATA&nbsp;lv_uzeit(8)&nbsp;.<br />
+&nbsp;&nbsp;WRITE&nbsp;:&nbsp;sy-datum&nbsp;TO&nbsp;lv_datum&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sy-uzeit&nbsp;TO&nbsp;lv_uzeit&nbsp;.<br />
+&nbsp;&nbsp;top_of_page&nbsp;:&nbsp;'H'&nbsp;'&nbsp;'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'Belge&nbsp;listesi'&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'S'&nbsp;'Kullanici'&nbsp;&nbsp;sy-uname&nbsp;&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'S'&nbsp;'Tarih'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lv_datum&nbsp;&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'S'&nbsp;'Saat'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lv_uzeit&nbsp;&nbsp;.<br />
+ENDFORM.<br />
+FORM top_of_page.<br />
+&nbsp;&nbsp;CALL&nbsp;FUNCTION&nbsp;'REUSE_ALV_COMMENTARY_WRITE'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_logo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'ENJOYSAP_LOGO'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it_list_commentary&nbsp;=&nbsp;gt_top[].<br />
+ENDFORM.<br />
+            </div>
+          </td>
+        </tr>
+      </table>
+      </td>
+      </tr>

@@ -1,0 +1,528 @@
+<!DOCTY "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="application/xht />
+<title>ZZAS_P004</title>
+</head>
+<body>
+<table class="outerTable">
+  <tr class="normalBoldLarge">
+     <td><h2>Code listing for: ZZAS_P004</h2>
+<h3> Description: </h3></td>
+   </tr>
+  <tr>
+     <td>
+     <table class="innerTable">
+       <tr>
+          <td>
+   <div class="code">
+REPORT ZZAS_P004.<br />
+TYPE-POOLS : slis .<br />
+TABLES: but000, but020, adrt, adr6, zzas_t04, zzas_t06, zzas_t07.<br />
+DATA : gt_fcat         TYPE  slis_t_fieldcat_alv  WITH HEADER LINE,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_fcat&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LIKE&nbsp;&nbsp;gt_fcat,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gt_fieldcatalog&nbsp;TYPE&nbsp;&nbsp;slis_fieldcat_alv,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_fieldcatalog&nbsp;like&nbsp;&nbsp;gt_fieldcatalog,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_layout&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;&nbsp;slis_layout_alv,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gt_top&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;&nbsp;slis_t_listheader&nbsp;&nbsp;&nbsp;&nbsp;WITH&nbsp;HEADER&nbsp;LINE.<br />
+FIELD-SYMBOLS: &lt;gfs_fcatt&gt; type lvc_s_fcat.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data:&nbsp;gs_log&nbsp;&nbsp;type&nbsp;zzas_t06.<br />
+data: pnot     type zzas_t06-zrem,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pmail&nbsp;type&nbsp;zzas_t06-pmail,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;permformno&nbsp;type&nbsp;zzas_t06-permformno&nbsp;.<br />
+data: pno     type zzas_t07-pno,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pnsurname&nbsp;type&nbsp;zzas_t07-pnsurname,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PYPNO&nbsp;type&nbsp;zzas_t07-pypno.<br />
+types: begin of gty_ot3,<br />
+&nbsp;&nbsp;PNO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;zzas_t07-pno,<br />
+&nbsp;&nbsp;PNSURNAME&nbsp;type&nbsp;zzas_t07-pnsurname,<br />
+&nbsp;&nbsp;PMAIL&nbsp;type&nbsp;zzas_t07-pmail,<br />
+&nbsp;&nbsp;PYPNO&nbsp;type&nbsp;zzas_t07-pypno,<br />
+&nbsp;&nbsp;end&nbsp;of&nbsp;gty_ot3.<br />
+TYPES : BEGIN OF gty_ot2,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mark&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;PERMFORMNO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;zzas_t06-permformno,<br />
+&nbsp;&nbsp;ZREM&nbsp;type&nbsp;zzas_t06-zrem,<br />
+&nbsp;&nbsp;PMAIL&nbsp;type&nbsp;zzas_t06-pmail,<br />
+&nbsp;&nbsp;status&nbsp;type&nbsp;zzas_t06-status,<br />
+&nbsp;&nbsp;status2&nbsp;type&nbsp;zzas_t06-status2,<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;status_text&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;zzas_t06-status_text,<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END&nbsp;OF&nbsp;gty_ot2.<br />
+types: begin of gty_004,<br />
+&nbsp;&nbsp;REMARK&nbsp;type&nbsp;zzas_t04-zrem,<br />
+&nbsp;&nbsp;SMTP_ADDR&nbsp;type&nbsp;zzas_t04-zsmtp,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;end&nbsp;of&nbsp;gty_004.<br />
+data: gt_t004 type table of gty_004,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_t004&nbsp;type&nbsp;gty_004.<br />
+DATA: gt_t003t TYPE TABLE OF t003t,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gt_bseg&nbsp;&nbsp;TYPE&nbsp;TABLE&nbsp;OF&nbsp;bseg,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_bseg&nbsp;&nbsp;TYPE&nbsp;bseg,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_t003t&nbsp;TYPE&nbsp;t003t,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gt_ot2&nbsp;&nbsp;&nbsp;TYPE&nbsp;TABLE&nbsp;OF&nbsp;gty_ot2,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gt_ot3&nbsp;&nbsp;&nbsp;TYPE&nbsp;TABLE&nbsp;OF&nbsp;gty_ot3,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_ot2&nbsp;&nbsp;&nbsp;TYPE&nbsp;gty_ot2,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_ot3&nbsp;&nbsp;&nbsp;TYPE&nbsp;gty_ot3,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;go_salv&nbsp;&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+&nbsp;&nbsp;PERFORM&nbsp;:&nbsp;get_data&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_data&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;show_alv.<br />
+DEFINE top_of_page  .<br />
+&nbsp;&nbsp;gt_top-typ&nbsp;&nbsp;=&nbsp;&1&nbsp;.<br />
+&nbsp;&nbsp;gt_top-key&nbsp;&nbsp;=&nbsp;&2&nbsp;.<br />
+&nbsp;&nbsp;gt_top-info&nbsp;=&nbsp;&3&nbsp;.<br />
+&nbsp;&nbsp;APPEND&nbsp;gt_top&nbsp;.&nbsp;CLEAR&nbsp;gt_top&nbsp;.<br />
+end-of-definition   .<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+FORM get_data .<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;SELECT&nbsp;b~partner&nbsp;d~addrnumber&nbsp;d~remark&nbsp;c~SMTP_ADDR<br />
+*&nbsp;&nbsp;FROM&nbsp;but000&nbsp;AS&nbsp;b<br />
+**&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;but020&nbsp;AS&nbsp;d&nbsp;ON&nbsp;d~addrnumber&nbsp;EQ&nbsp;a~addrcomm<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;adrt&nbsp;AS&nbsp;d&nbsp;ON&nbsp;b~addrcomm&nbsp;EQ&nbsp;d~addrnumber<br />
+*&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;adr6&nbsp;AS&nbsp;c&nbsp;ON&nbsp;c~addrnumber&nbsp;EQ&nbsp;d~addrnumber<br />
+*<br />
+*&nbsp;&nbsp;INTO&nbsp;CORRESPONDING&nbsp;FIELDS&nbsp;OF&nbsp;TABLE&nbsp;gt_ot2.<br />
+<br />
+<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;SELECT&nbsp;*<br />
+&nbsp;&nbsp;FROM&nbsp;zzas_t06<br />
+<br />
+&nbsp;&nbsp;INTO&nbsp;CORRESPONDING&nbsp;FIELDS&nbsp;OF&nbsp;TABLE&nbsp;gt_ot2.<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;lt_dd07t&nbsp;type&nbsp;standard&nbsp;table&nbsp;of&nbsp;dd07t.<br />
+&nbsp;&nbsp;data&nbsp;ls_dd07t&nbsp;like&nbsp;line&nbsp;of&nbsp;lt_dd07t.<br />
+<br />
+&nbsp;&nbsp;select&nbsp;*&nbsp;from&nbsp;dd07t&nbsp;into&nbsp;table&nbsp;lt_dd07t<br />
+&nbsp;&nbsp;&nbsp;&nbsp;where&nbsp;ddlanguage&nbsp;eq&nbsp;'T'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;&nbsp;&nbsp;domname&nbsp;like&nbsp;'ZZPRM%'.<br />
+<br />
+<br />
+&nbsp;&nbsp;loop&nbsp;at&nbsp;gt_ot2&nbsp;into&nbsp;gs_ot2.<br />
+<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;read&nbsp;table&nbsp;lt_dd07t&nbsp;into&nbsp;ls_dd07t&nbsp;with&nbsp;key&nbsp;domname&nbsp;=&nbsp;'ZZPRM_PERMTYPE_DO'&nbsp;domvalue_l&nbsp;=&nbsp;gs_list-perm_type.<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;sy-subrc&nbsp;eq&nbsp;0.<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_list-perm_type_text&nbsp;=&nbsp;ls_dd07t-ddtext.<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;endif.<br />
+<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;read&nbsp;table&nbsp;lt_dd07t&nbsp;into&nbsp;ls_dd07t&nbsp;with&nbsp;key&nbsp;domname&nbsp;=&nbsp;'ZZPRM_STATU_DOO'&nbsp;domvalue_l&nbsp;=&nbsp;gs_OT2-status.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;sy-subrc&nbsp;eq&nbsp;0.<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_OT2-status_text&nbsp;=&nbsp;ls_dd07t-ddtext.<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;endif.<br />
+<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;gs_ot2-status&nbsp;=&nbsp;'ZZAS_S'.<br />
+<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;select&nbsp;single&nbsp;pnsurname&nbsp;from&nbsp;zzprm_t001&nbsp;into&nbsp;gs_list-pnsurname<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;where&nbsp;pno&nbsp;eq&nbsp;gs_list-pno.<br />
+<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;modify&nbsp;gt_OT2&nbsp;from&nbsp;gs_OT2.<br />
+&nbsp;&nbsp;endloop.<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;SELECT&nbsp;b~partner&nbsp;d~addrnumber<br />
+*&nbsp;&nbsp;FROM&nbsp;but000&nbsp;AS&nbsp;b<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;INNER&nbsp;JOIN&nbsp;but020&nbsp;AS&nbsp;d&nbsp;ON&nbsp;d~partner&nbsp;EQ&nbsp;b~partner<br />
+*<br />
+*&nbsp;&nbsp;INTO&nbsp;CORRESPONDING&nbsp;FIELDS&nbsp;OF&nbsp;TABLE&nbsp;gt_ot2.<br />
+*<br />
+*<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;loop&nbsp;at&nbsp;gt_ot2&nbsp;into&nbsp;gs_ot2.<br />
+*<br />
+*<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;select&nbsp;single&nbsp;SMTP_ADDR&nbsp;from&nbsp;ADR6&nbsp;into&nbsp;gs_ot2-smtp_addr<br />
+*<br />
+*WHERE&nbsp;addrnumber&nbsp;EQ&nbsp;gs_OT2-addrnumber.<br />
+*<br />
+*<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;select&nbsp;single&nbsp;REMARK&nbsp;from&nbsp;ADRt&nbsp;into&nbsp;gs_ot2-remark<br />
+*<br />
+*WHERE&nbsp;addrnumber&nbsp;EQ&nbsp;gs_OT2-addrnumber.<br />
+*<br />
+**<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;modify&nbsp;gt_ot2&nbsp;from&nbsp;gs_ot2.<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endloop.<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+   </div>
+   <div class="code">
+ENDFORM.<br />
+<br />
+FORM set_data .<br />
+<br />
+ENDFORM.<br />
+<br />
+<br />
+FORM show_alv .<br />
+<br />
+&nbsp;&nbsp;PERFORM:<br />
+&nbsp;&nbsp;set_fc_sub&nbsp;USING&nbsp;'PERMFORMNO'&nbsp;'Mail&nbsp;Form&nbsp;No'&nbsp;abap_true&nbsp;'&nbsp;',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'ZREM'&nbsp;'NOT'&nbsp;abap_true&nbsp;'X',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'PMAIL'&nbsp;'MAIL'&nbsp;abap_true&nbsp;'&nbsp;',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'STATUS'&nbsp;'Durum'&nbsp;abap_true&nbsp;'&nbsp;'.<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'STATUS2'&nbsp;'Durum'&nbsp;abap_true&nbsp;'&nbsp;'.<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;using&nbsp;'STATUS_TEXT'&nbsp;'Statü'&nbsp;abap_true&nbsp;'&nbsp;'.<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'BLART'&nbsp;'Tür'&nbsp;'&nbsp;'&nbsp;'&nbsp;',<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'BLDAT'&nbsp;'Belge&nbsp;Tarihi'&nbsp;'&nbsp;'&nbsp;'&nbsp;',<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'BUDAT'&nbsp;'Kayýt&nbsp;Tarihi'&nbsp;'&nbsp;'&nbsp;'&nbsp;',<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'WAERS'&nbsp;'PB'&nbsp;'&nbsp;'&nbsp;'&nbsp;',<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_fc_sub&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'WRBTR'&nbsp;'Tutar'&nbsp;'&nbsp;'&nbsp;'&nbsp;'.<br />
+**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;USING&nbsp;'LTEXT'&nbsp;'Taným'&nbsp;'&nbsp;'&nbsp;'4'&nbsp;'&nbsp;'<br />
+<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;PERFORM&nbsp;:&nbsp;create_layout&nbsp;,<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create_fcat&nbsp;&nbsp;&nbsp;,<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;top_title&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create_alv&nbsp;&nbsp;&nbsp;&nbsp;.<br />
+<br />
+ENDFORM.<br />
+<br />
+<br />
+<br />
+FORM create_layout .<br />
+<br />
+&nbsp;&nbsp;gs_layout-colwidth_optimize&nbsp;=&nbsp;'X'.<br />
+&nbsp;&nbsp;gs_layout-zebra&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'X'.<br />
+&nbsp;&nbsp;gs_layout-box_fieldname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'MARK'.<br />
+<br />
+ENDFORM.<br />
+<br />
+<br />
+FORM create_alv .<br />
+<br />
+&nbsp;&nbsp;CALL&nbsp;FUNCTION&nbsp;'REUSE_ALV_GRID_DISPLAY'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_callback_program&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;sy-repid<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_callback_pf_status_set&nbsp;=&nbsp;'GUI'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_callback_user_command&nbsp;&nbsp;=&nbsp;'USER_COMMAND'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_layout&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gs_layout<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it_fieldcat&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gt_FCAT[]<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_callback_top_of_page&nbsp;&nbsp;&nbsp;=&nbsp;'TOP_OF_PAGE'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;TABLES<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t_outtab&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gt_ot2[]<br />
+&nbsp;&nbsp;&nbsp;&nbsp;EXCEPTIONS<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;program_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;1<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;2.<br />
+<br />
+   </div>
+   <div class="codeComment">
+*CALL&nbsp;FUNCTION&nbsp;'REUSE_ALV_GRID_DISPLAY_LVC'<br />
+*&nbsp;&nbsp;EXPORTING<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;i_callback_program&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;sy-repid<br />
+**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_callback_pf_status_set&nbsp;=&nbsp;'GUI'<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;is_layout_lvc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gs_layout<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;i_callback_user_command&nbsp;=&nbsp;'USER_COMMAND'<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;it_fieldcat_lvc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;it_fieldcat<br />
+*&nbsp;&nbsp;TABLES<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;t_outtab&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gt_ot2[]<br />
+*&nbsp;&nbsp;EXCEPTIONS<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;program_error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;1<br />
+*&nbsp;&nbsp;&nbsp;&nbsp;OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;2.<br />
+**IF&nbsp;sy-subrc&nbsp;NE&nbsp;0.<br />
+**&nbsp;&nbsp;MESSAGE&nbsp;ID&nbsp;sy-msgid&nbsp;TYPE&nbsp;sy-msgty&nbsp;NUMBER&nbsp;sy-msgno<br />
+**&nbsp;&nbsp;WITH&nbsp;sy-msgv1&nbsp;sy-msgv2&nbsp;sy-msgv3&nbsp;sy-msgv4.<br />
+**ENDIF.<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+   </div>
+   <div class="code">
+ENDFORM.<br />
+<br />
+FORM create_fcat .<br />
+<br />
+&nbsp;&nbsp;CALL&nbsp;FUNCTION&nbsp;'REUSE_ALV_FIELDCATALOG_MERGE'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_program_name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;sy-repid<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_internal_tabname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'GT_OT'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_inclname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;sy-repid<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_client_never_display&nbsp;=&nbsp;'X'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_bypassing_buffer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'X'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CHANGING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ct_fieldcat&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gt_fcat[]<br />
+&nbsp;&nbsp;&nbsp;&nbsp;EXCEPTIONS<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OTHERS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;3.<br />
+<br />
+<br />
+<br />
+ENDFORM.<br />
+<br />
+FORM set_fc_sub USING p_fieldname<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p_seltext_s<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;p_seltext_m<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;p_seltext_l<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;p_key<br />
+&nbsp;&nbsp;p_hotspot.<br />
+&nbsp;&nbsp;CLEAR:&nbsp;gs_fieldcatalog.<br />
+&nbsp;&nbsp;gs_fieldcatalog-fieldname&nbsp;=&nbsp;p_fieldname.<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;gs_fieldcatalog-seltext_s&nbsp;=&nbsp;p_seltext_s.<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;gs_fieldcatalog-seltext_m&nbsp;=&nbsp;p_seltext_m.<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;gs_fieldcatalog-seltext_l&nbsp;=&nbsp;p_seltext_l.<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;gs_fieldcatalog-key&nbsp;=&nbsp;&nbsp;p_key.<br />
+&nbsp;&nbsp;gs_fieldcatalog-hotspot&nbsp;=&nbsp;&nbsp;p_hotspot.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;gs_fieldcatalog-ref_tabname&nbsp;=&nbsp;'ZZAS_T06'.<br />
+   </div>
+   <div class="codeComment">
+*&nbsp;&nbsp;gs_fieldcatalog-ref_fieldname&nbsp;=&nbsp;'STATUS_TEXT'.<br />
+   </div>
+   <div class="code">
+&nbsp;&nbsp;APPEND&nbsp;gs_fieldcatalog&nbsp;TO&nbsp;gt_fcat.<br />
+ENDFORM.<br />
+<br />
+<br />
+FORM modify_fieldcatalog_text USING fieldname text l_text.<br />
+<br />
+ENDFORM.<br />
+<br />
+FORM modify_fcat  USING fieldname target value p_hotspot.<br />
+&nbsp;&nbsp;DATA:&nbsp;lv_fieldname(30).<br />
+&nbsp;&nbsp;FIELD-SYMBOLS:&nbsp;&lt;field&gt;&nbsp;TYPE&nbsp;any.<br />
+&nbsp;&nbsp;READ&nbsp;TABLE&nbsp;gt_fcat&nbsp;WITH&nbsp;KEY&nbsp;fieldname&nbsp;=&nbsp;fieldname&nbsp;INTO&nbsp;gs_fcat.<br />
+&nbsp;&nbsp;CHECK&nbsp;sy-subrc&nbsp;=&nbsp;0.<br />
+&nbsp;&nbsp;CONCATENATE&nbsp;'GS_FCAT-'&nbsp;target&nbsp;INTO&nbsp;lv_fieldname.<br />
+&nbsp;&nbsp;ASSIGN&nbsp;(lv_fieldname)&nbsp;TO&nbsp;&lt;field&gt;.<br />
+&nbsp;&nbsp;&lt;field&gt;&nbsp;=&nbsp;value.<br />
+&nbsp;&nbsp;MODIFY&nbsp;gt_fcat&nbsp;FROM&nbsp;gs_fcat&nbsp;INDEX&nbsp;sy-tabix&nbsp;.<br />
+<br />
+<br />
+ENDFORM.<br />
+<br />
+<br />
+FORM gui USING g_xpa TYPE slis_t_extab.<br />
+<br />
+&nbsp;&nbsp;SET&nbsp;PF-STATUS&nbsp;'ZSTANDARD'.<br />
+<br />
+ENDFORM.<br />
+<br />
+FORM user_command USING p_ucomm TYPE sy-ucomm<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ps_selfield&nbsp;TYPE&nbsp;slis_selfield.<br />
+&nbsp;&nbsp;DATA:&nbsp;lv_mes&nbsp;TYPE&nbsp;char200,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lv_ind&nbsp;TYPE&nbsp;numc2.<br />
+&nbsp;&nbsp;CASE&nbsp;p_ucomm.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;'&IC1'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;'&MSG2'.<br />
+read table gt_OT2 into gs_OT2 index ps_selfield-tabindex.<br />
+if gs_ot2-status2 = '01'.<br />
+update zzas_t06 set status = '03' where permformno eq gs_ot2-permformno.<br />
+message 'Reddedildi.' type 'I' display like 'S'.<br />
+ELSEIF gs_ot2-status2 = '02'.<br />
+update zzas_t06 set status = '03' where permformno eq gs_ot2-permformno.<br />
+message 'Reddedildi.' type 'I' display like 'S'.<br />
+ENDIF.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;WHEN&nbsp;'&MSG'.<br />
+read table gt_OT2 into gs_OT2 index ps_selfield-tabindex.<br />
+if gs_ot2-status2 = '01'.<br />
+constants:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gc_subject&nbsp;type&nbsp;so_obj_des&nbsp;value&nbsp;'ABAP&nbsp;Email&nbsp;with&nbsp;CL_BCS',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gc_raw&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;char03&nbsp;value&nbsp;'RAW'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gv_mlrec&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;so_obj_nam,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gv_sent_to_all&nbsp;&nbsp;&nbsp;type&nbsp;os_boolean,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gv_email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;adr6-smtp_addr,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gv_subject&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;so_obj_des,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gv_text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;bcsy_text,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gr_send_request&nbsp;&nbsp;type&nbsp;ref&nbsp;to&nbsp;cl_bcs,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gr_bcs_exception&nbsp;type&nbsp;ref&nbsp;to&nbsp;cx_bcs,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gr_recipient&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;ref&nbsp;to&nbsp;if_recipient_bcs,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gr_sender&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;ref&nbsp;to&nbsp;if_sender_bcs&nbsp;value&nbsp;is&nbsp;initial,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gr_document&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;ref&nbsp;to&nbsp;cl_document_bcs,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gv_sender&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;adr6-smtp_addr.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;try.<br />
+gr_send_request = cl_bcs=&gt;create_persistent( ).<br />
+gv_sender = 'IK@mdpgroup.com'.<br />
+gr_sender = cl_cam_address_bcs=&gt;create_internet_address( gv_sender ).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call&nbsp;method&nbsp;gr_send_request-&gt;set_sender<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exporting<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_sender&nbsp;=&nbsp;gr_sender.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data:&nbsp;lv_pypno&nbsp;type&nbsp;zzas_t07-pypno.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;select&nbsp;single&nbsp;pypno&nbsp;from&nbsp;zzas_t07&nbsp;into&nbsp;lv_pypno.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;ls_t0011&nbsp;type&nbsp;zzas_t07.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;select&nbsp;single&nbsp;*&nbsp;from&nbsp;zzas_t07&nbsp;into&nbsp;ls_t0011<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;where&nbsp;pno&nbsp;eq&nbsp;lv_pypno.<br />
+gv_email = ls_t0011-pmail.<br />
+gr_recipient = cl_cam_address_bcs=&gt;create_internet_address( gv_email ).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call&nbsp;method&nbsp;gr_send_request-&gt;add_recipient<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exporting<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_recipient&nbsp;=&nbsp;gr_recipient<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_express&nbsp;&nbsp;&nbsp;=&nbsp;'X'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;lv_text&nbsp;type&nbsp;char255.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;concatenate&nbsp;gs_ot2-permformno&nbsp;'onay&nbsp;bekliyor!'&nbsp;into&nbsp;lv_text<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;separated&nbsp;by&nbsp;space.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;append&nbsp;lv_text&nbsp;to&nbsp;gv_text.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gr_document&nbsp;=&nbsp;cl_document_bcs=&gt;create_document(<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_type&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gc_raw<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_text&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gv_text<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_length&nbsp;&nbsp;=&nbsp;'12'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_subject&nbsp;=&nbsp;gc_subject&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call&nbsp;method&nbsp;gr_send_request-&gt;set_document(&nbsp;gr_document&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;call&nbsp;method&nbsp;gr_send_request-&gt;send(<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exporting<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_with_error_screen&nbsp;=&nbsp;'X'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;receiving<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;gv_sent_to_all&nbsp;).<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;gv_sent_to_all&nbsp;=&nbsp;'X'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;write&nbsp;'Email&nbsp;sent!'.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endif.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;commit&nbsp;work.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;catch&nbsp;cx_bcs&nbsp;into&nbsp;gr_bcs_exception.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;write:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'Error!',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'Error&nbsp;type:',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gr_bcs_exception-&gt;error_type.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;endtry.<br />
+update zzas_t06 set status2 = '02' where permformno eq gs_ot2-permformno.<br />
+message 'Üst yönetici onayýna gönderildi.' type 'I' display like 'S'.<br />
+elseif gs_ot2-status2 = '02'.<br />
+update zzas_t06 set status = '02' where permformno eq gs_ot2-permformno.<br />
+update zzas_t06 set status2 = '03' where permformno eq gs_ot2-permformno.<br />
+message 'Onaylandý.' type 'I' display like 'S'.<br />
+endif.<br />
+&nbsp;&nbsp;ENDCASE.<br />
+ENDFORM.<br />
+<br />
+FORM top_title.<br />
+<br />
+&nbsp;&nbsp;DATA&nbsp;lv_datum(10)&nbsp;.<br />
+&nbsp;&nbsp;DATA&nbsp;lv_uzeit(8)&nbsp;.<br />
+<br />
+&nbsp;&nbsp;WRITE&nbsp;:&nbsp;sy-datum&nbsp;TO&nbsp;lv_datum&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sy-uzeit&nbsp;TO&nbsp;lv_uzeit&nbsp;.<br />
+<br />
+&nbsp;&nbsp;top_of_page&nbsp;:&nbsp;'H'&nbsp;'&nbsp;'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'Belge&nbsp;listesi'&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'S'&nbsp;'Kullanici'&nbsp;&nbsp;sy-uname&nbsp;&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'S'&nbsp;'Tarih'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lv_datum&nbsp;&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'S'&nbsp;'Saat'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lv_uzeit&nbsp;&nbsp;.<br />
+<br />
+ENDFORM.<br />
+<br />
+FORM top_of_page.<br />
+<br />
+&nbsp;&nbsp;CALL&nbsp;FUNCTION&nbsp;'REUSE_ALV_COMMENTARY_WRITE'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;EXPORTING<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i_logo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'ENJOYSAP_LOGO'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it_list_commentary&nbsp;=&nbsp;gt_top[].<br />
+<br />
+ENDFORM.<br />
+<br />
+<br />
+   </div>
+   <div class="codeComment">
+*Messages<br />
+*----------------------------------------------------------<br />
+*<br />
+*&nbsp;Message&nbsp;class:&nbsp;Hard&nbsp;coded<br />
+*&nbsp;&nbsp;&nbsp;Reddedildi.<br />
+            </div>
+          </td>
+        </tr>
+      </table>
+      </td>
+      </tr>

@@ -1,0 +1,71 @@
+<!DOCTY "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="application/xht />
+<title>ZZAS_P001_TOP</title>
+</head>
+<body>
+<table class="outerTable">
+  <tr class="normalBoldLarge">
+     <td><h2>Code listing for: ZZAS_P001_TOP</h2>
+<h3> Description: </h3></td>
+   </tr>
+  <tr>
+     <td>
+     <table class="innerTable">
+       <tr>
+          <td>
+   <div class="code">
+TYPE-POOLS : slis .<br />
+TABLES: but000, but020, adrt, adr6, zzas_t04, zzas_t06, zzas_t07.<br />
+DATA : gt_fcat         TYPE  slis_t_fieldcat_alv  WITH HEADER LINE,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_fcat&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LIKE&nbsp;&nbsp;gt_fcat,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gt_fieldcatalog&nbsp;TYPE&nbsp;&nbsp;slis_fieldcat_alv,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_fieldcatalog&nbsp;LIKE&nbsp;&nbsp;gt_fieldcatalog,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_layout&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;&nbsp;slis_layout_alv,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gt_top&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;&nbsp;slis_t_listheader&nbsp;&nbsp;&nbsp;&nbsp;WITH&nbsp;HEADER&nbsp;LINE.<br />
+DATA: gs_log  TYPE zzas_t06.<br />
+DATA: pnot       TYPE zzas_t06-zrem,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pmail&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;zzas_t06-pmail,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;permformno&nbsp;TYPE&nbsp;zzas_t06-permformno.<br />
+DATA: pno       TYPE zzas_t07-pno,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pnsurname&nbsp;TYPE&nbsp;zzas_t07-pnsurname,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pypno&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;zzas_t07-pypno.<br />
+TYPES: BEGIN OF gty_ot3,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pno&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;zzas_t07-pno,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pnsurname&nbsp;TYPE&nbsp;zzas_t07-pnsurname,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pmail&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;zzas_t07-pmail,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pypno&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;zzas_t07-pypno,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END&nbsp;OF&nbsp;gty_ot3.<br />
+TYPES : BEGIN OF gty_ot2,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mark&nbsp;,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;partner&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;zzas_t04-zpart,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;addrnumber&nbsp;TYPE&nbsp;zzas_t04-zadd,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;addrcomm&nbsp;&nbsp;&nbsp;TYPE&nbsp;but000-addrcomm,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;remark&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;zzas_t04-zrem,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_addr&nbsp;&nbsp;TYPE&nbsp;zzas_t04-zsmtp,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;permformno&nbsp;TYPE&nbsp;zzas_t06-permformno,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zrem&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;zzas_t06-zrem,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pmail&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;zzas_t06-pmail,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END&nbsp;OF&nbsp;gty_ot2.<br />
+TYPES: BEGIN OF gty_004,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;remark&nbsp;&nbsp;&nbsp;&nbsp;TYPE&nbsp;zzas_t04-zrem,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;smtp_addr&nbsp;TYPE&nbsp;zzas_t04-zsmtp,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;END&nbsp;OF&nbsp;gty_004.<br />
+DATA: gt_t004 TYPE TABLE OF gty_004,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_t004&nbsp;TYPE&nbsp;gty_004.<br />
+DATA: gt_t003t TYPE TABLE OF t003t,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gt_bseg&nbsp;&nbsp;TYPE&nbsp;TABLE&nbsp;OF&nbsp;bseg,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_bseg&nbsp;&nbsp;TYPE&nbsp;bseg,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_t003t&nbsp;TYPE&nbsp;t003t,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gt_ot2&nbsp;&nbsp;&nbsp;TYPE&nbsp;TABLE&nbsp;OF&nbsp;gty_ot2,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gt_ot3&nbsp;&nbsp;&nbsp;TYPE&nbsp;TABLE&nbsp;OF&nbsp;gty_ot3,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_ot2&nbsp;&nbsp;&nbsp;TYPE&nbsp;gty_ot2,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gs_ot3&nbsp;&nbsp;&nbsp;TYPE&nbsp;gty_ot3,<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;go_salv&nbsp;&nbsp;TYPE&nbsp;REF&nbsp;TO&nbsp;cl_salv_table.<br />
+            </div>
+          </td>
+        </tr>
+      </table>
+      </td>
+      </tr>
